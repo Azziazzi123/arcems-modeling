@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCEMS Modeling Group</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #004080;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background: #f4f4f4;
+            padding: 10px;
+        }
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+        }
+        nav a:hover {
+            color: #004080;
+        }
+        section {
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 15px;
+            flex-grow: 1;
+        }
+        .card-content a {
+            text-decoration: none;
+            color: #004080;
+            font-weight: bold;
+        }
+        .video-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .video-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .video-container video {
+            width: 48%;
+        }
+        footer {
+            background: #004080;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ARCEMS Modeling Group</h1>
+        <p>Driving innovation in marine, terrestrial, and atmospheric modeling</p>
+    </header>
+    <nav>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#team">Team</a>
+        <a href="#contact">Contact</a>
+    </nav>
+    <section id="about" class="container">
+        <h2>About Us</h2>
+        <p>The ARCEMS Modeling Group is a pioneering team committed to addressing environmental challenges through state-of-the-art modeling and research. With expertise spanning marine, terrestrial, and atmospheric domains, we employ advanced numerical models, satellite data analysis, and in-depth field studies to deliver impactful solutions. Our projects contribute significantly to sustainable development, conservation efforts, and policy formulation.</p>
+        <p>Our multidisciplinary team collaborates with leading research institutions and industry stakeholders to push the boundaries of scientific innovation. By integrating technology with environmental science, we strive to tackle pressing issues like climate change, pollution mitigation, and resource management.</p>
+        <p>At ARCEMS, our mission is driven by a shared vision: to empower communities and industries with data-driven insights, fostering a harmonious coexistence with nature. Join us as we pave the way for a sustainable future through research, innovation, and education.</p>
+        <div class="video-section">
+            <h3>Modeling Group Overview</h3>
+            <video controls width="800">
+                <source src="PPT_GIKS_2025_plan_R3.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </section>
+    <section id="projects" class="container">
+        <h2>Our Projects</h2>
+        <div class="grid">
+            <div class="card">
+                <img src="oil_spill.png" alt="Project 1">
+                <div class="card-content">
+                    <h3>Oil Spill Modeling</h3>
+                    <p>Advanced GNOME-based modeling for oil spill prediction and mitigation.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="air_dispersion.png" alt="Project 2">
+                <div class="card-content">
+                    <h3>Air Dispersion Studies</h3>
+                    <p>CALPUFF simulations for industrial emissions and air quality assessments.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="satellite.png" alt="Project 3">
+                <div class="card-content">
+                    <h3>Satellite Data Analysis</h3>
+                    <p>NDVI, NDWI, and other indices for terrestrial and environmental insights.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="video-section container">
+        <h2>New Work: Tidal Forecasting and Simulation Tools</h2>
+        <div class="video-container">
+            <video controls>
+                <source src="tidal_forecasting.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <video controls>
+                <source src="tide_simulation.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <p>Explore our latest innovations in tidal forecasting and simulation tools, designed to provide accurate predictions and insights for marine operations and research.</p>
+    </section>
+    <section id="team" class="container">
+        <h2>Meet the Team</h2>
+        <div class="grid">
+            <div class="card">
+                <img src="jiya_albert.jpg" alt="Dr. Jiya Albert Velickakath Joseph">
+                <div class="card-content">
+                    <h3>Dr. Jiya Albert Velickakath Joseph</h3>
+                    <p>Group Leader, Research Engineer III - Driving innovative solutions in environmental modeling and research.</p>
+                    <a href="jiya_albert.html">Learn more</a>
+                </div>
+            </div>
+            <div class="card">
+                <img src="chaitanya.jpg" alt="Dr. Venkata Sai Chaitanya Akurathi">
+                <div class="card-content">
+                    <h3>Dr. Venkata Sai Chaitanya Akurathi</h3>
+                    <p>Environmental Engineer III - Specialist in environmental impact assessments and dispersion modeling.</p>
+                    <a href="chaitanya.html">Learn more</a>
+                </div>
+            </div>
+            <div class="card">
+                <img src="azeez.jpeg" alt="Mr. Abdul Azeez Saleem">
+                <div class="card-content">
+                    <h3>Mr. Abdul Azeez Saleem</h3>
+                    <p>Marine Scientist III - Focused on marine ecosystem modeling and sediment analysis.</p>
+                    <a href="abdul_azeez.html">Learn more</a>
+                </div>
+            </div>
+            <div class="card">
+                <img src="salim.jpeg" alt="Mr. Salim Lateef">
+                <div class="card-content">
+                    <h3>Mr. Salim Lateef</h3>
+                    <p>Lab Engineer III - Expert in experimental setups and laboratory data analysis.</p>
+                    <a href="salim_lateef.html">Learn more</a>
+                </div>
+            </div>
+            <div class="card">
+                <img src="Dr_Shafeeque.jpg" alt="Dr. Muhammad Sahfeeque">
+                <div class="card-content">
+                    <h3>Dr. Muhammad Sahfeeque</h3>
+                    <p>Post Doctoral Fellow - Researching advanced numerical modeling techniques and applications.</p>
+                    <a href="muhammed_sahfeeque.html">Learn more</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="contact" class="container">
+        <h2>Contact Us</h2>
+        <p>If you'd like to collaborate or learn more about our work, reach out to us at:</p>
+        <ul>
+            <li>Email: jiya.bert@kfupm.edu.sa</li>
+            <li>Phone: +966-570991766</li>
+            <li>Location: ARCEMS Center, KFUPM, Dhahran, Saudi Arabia</li>
+        </ul>
+    </section>
+    <footer>
+        <p>&copy; 2025 ARCEMS Modeling Group. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
