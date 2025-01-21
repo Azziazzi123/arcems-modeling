@@ -114,13 +114,15 @@
                         marker: { size: 6 }
                     };
 
+                    // Determine 6-hour intervals
+                    const tickvals = xData.filter((_, index) => index % 6 === 0); // Keep every 6th data point
+
                     const layout = {
                         title: 'Geo Tide vs Date Time',
                         xaxis: { 
-                            title: 'Date Time', 
-                            type: 'category',
-                            tickformat: '%H:%M', // Show time in HH:MM format
-                            dtick: 21600000 // 6 hours in milliseconds (6 * 60 * 60 * 1000)
+                            title: 'Date Time',
+                            tickvals: tickvals,
+                            tickformat: '%Y-%m-%d %H:%M' // Format as date-time
                         },
                         yaxis: { title: 'Geo Tide (m)' },
                         margin: { t: 40, l: 50, r: 20, b: 50 }
