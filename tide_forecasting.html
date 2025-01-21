@@ -97,7 +97,7 @@
                     }
 
                     // Extract x (DateTime) and y (Geo Tide) data
-                    const xData = data.map(row => row.DateTime);
+                    const xData = data.map(row => new Date(row.DateTime)); // Convert DateTime to Date objects
                     const yData = data.map(row => parseFloat(row['Geo_Tide (m)']));
 
                     console.log("Parsed X Data (DateTime):", xData);
@@ -120,8 +120,9 @@
                         title: 'Geo Tide vs Date Time',
                         xaxis: { 
                             title: 'Date Time',
-                            tickvals: tickvals,
-                            tickformat: '%Y-%m-%d %H:%M' // Format as date-time
+                            tickvals: tickvals, // Set tick values
+                            tickformat: '%Y-%m-%d %H:%M', // Format as date-time
+                            type: 'date' // Explicitly define X-axis as date
                         },
                         yaxis: { title: 'Geo Tide (m)' },
                         margin: { t: 40, l: 50, r: 20, b: 50 }
