@@ -73,26 +73,19 @@
         const baseMaps = { "Satellite": satellite, "Streets": streets };
         L.control.layers(baseMaps).addTo(map);
 
-        // Add marker at the desired location
-        const marker = L.marker([28.006414, 48.820455]).addTo(map);
-        marker.bindPopup("<b>Safaniya</b>").openPopup();
-
-        // Handle marker click
-        marker.on('click', function () {
-            console.log("Marker clicked. Attempting to parse CSV...");
-
-            // Parse CSV file
-            Papa.parse('tide_data.csv', {
+        // Function to handle CSV parsing and plotting
+        function plotGeoTide(csvFile, locationName) {
+            Papa.parse(csvFile, {
                 download: true,
                 header: true,
                 complete: function (result) {
-                    console.log("CSV data parsed successfully:", result.data);
+                    console.log(`${locationName} CSV data parsed successfully:`, result.data);
 
                     const data = result.data;
 
                     // Check if data exists
                     if (!data || data.length === 0) {
-                        console.error("No data found in CSV.");
+                        console.error(`No data found in CSV for ${locationName}.`);
                         return;
                     }
 
@@ -100,8 +93,8 @@
                     const xData = data.map(row => new Date(row.DateTime)); // Convert DateTime to Date objects
                     const yData = data.map(row => parseFloat(row['Geo_Tide (m)']));
 
-                    console.log("Parsed X Data (DateTime):", xData);
-                    console.log("Parsed Y Data (Geo Tide):", yData);
+                    console.log(`Parsed X Data for ${locationName}:`, xData);
+                    console.log(`Parsed Y Data for ${locationName}:`, yData);
 
                     // Plot the data
                     const trace = {
@@ -109,13 +102,13 @@
                         y: yData,
                         type: 'scatter',
                         mode: 'lines+markers',
-                        name: 'Geo Tide',
-                        line: { color: 'blue' },
+                        name: locationName,
+                        line: { color: locationName === 'Safaniya' ? 'blue' : 'green' },
                         marker: { size: 6 }
                     };
 
                     const layout = {
-                        title: 'Geo Tide vs Date Time',
+                        title: `Geo Tide vs Date Time (${locationName})`,
                         xaxis: { 
                             title: 'Date Time',
                             type: 'date', // Explicitly set as a date axis
@@ -134,9 +127,23 @@
                     modal.show();
                 },
                 error: function (error) {
-                    console.error("Error loading CSV:", error);
+                    console.error(`Error loading CSV for ${locationName}:`, error);
                 }
             });
+        }
+
+        // Add marker for Safaniya
+        const safaniyaMarker = L.marker([28.006414, 48.820455]).addTo(map);
+        safaniyaMarker.bindPopup("<b>Safaniya</b>").openPopup();
+        safaniyaMarker.on('click', function () {
+            plotGeoTide('tide_data.csv', 'Safaniya'); // Use Safaniya CSV file
+        });
+
+        // Add marker for Manifa
+        const manifaMarker = L.marker([27.749218, 48.895852]).addTo(map); // Approx. coordinates for Manifa
+        manifaMarker.bindPopup("<b>Manifa</b>").openPopup();
+        manifaMarker.on('click', function () {
+            plotGeoTide('manifa_data.csv', 'Manifa'); // Use Manifa CSV file
         });
     </script>
 </body>
