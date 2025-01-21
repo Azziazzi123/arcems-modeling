@@ -103,8 +103,8 @@
                     console.log("Parsed X Data (DateTime):", xData);
                     console.log("Parsed Y Data (Geo Tide):", yData);
 
-                    // Determine daily intervals
-                    const dailyTickvals = xData.filter(date => date.includes("00:00:00")); // Keep only midnight entries for daily ticks
+                    // Determine 12-hour intervals
+                    const tickvals = xData.filter((_, index) => index % 12 === 0); // Keep every 12th data point
 
                     const trace = {
                         x: xData,
@@ -120,8 +120,8 @@
                         title: 'Geo Tide vs Date Time',
                         xaxis: { 
                             title: 'Date Time',
-                            tickvals: dailyTickvals,
-                            tickformat: '%Y-%m-%d', // Format as YYYY-MM-DD
+                            tickvals: tickvals,
+                            tickformat: '%Y-%m-%d %H:%M' // Format as date-time
                         },
                         yaxis: { title: 'Geo Tide (m)' },
                         margin: { t: 40, l: 50, r: 20, b: 50 }
