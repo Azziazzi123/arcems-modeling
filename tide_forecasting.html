@@ -121,9 +121,10 @@
                             type: 'date', // Explicitly set as a date axis
                             dtick: 43200000, // 12 hours in milliseconds
                             tickformat: '%Y-%m-%d %H:%M', // Format as YYYY-MM-DD HH:MM
+                            tickangle: -45, // Rotate labels 45 degrees for better visibility
                         },
                         yaxis: { title: 'Geo Tide (m)' },
-                        margin: { t: 40, l: 50, r: 20, b: 50 }
+                        margin: { t: 40, l: 50, r: 20, b: 80 }, // Increase bottom margin
                     };
 
                     Plotly.newPlot('plot-container', [trace], layout);
