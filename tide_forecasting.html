@@ -116,7 +116,12 @@
 
                     const layout = {
                         title: 'Geo Tide vs Date Time',
-                        xaxis: { title: 'Date Time', type: 'category' },
+                        xaxis: { 
+                            title: 'Date Time', 
+                            type: 'category',
+                            tickformat: '%H:%M', // Show time in HH:MM format
+                            dtick: 21600000 // 6 hours in milliseconds (6 * 60 * 60 * 1000)
+                        },
                         yaxis: { title: 'Geo Tide (m)' },
                         margin: { t: 40, l: 50, r: 20, b: 50 }
                     };
