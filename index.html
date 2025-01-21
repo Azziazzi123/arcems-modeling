@@ -80,6 +80,59 @@
         .video-container video {
             width: 48%;
         }
+        }
+        .dropdown {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .dropdown button {
+            background-color: #004080;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .dropdown button:hover {
+            background-color: #003060;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .webtool-page {
+            display: flex;
+            height: 100vh;
+        }
+        .webtool-sidebar {
+            width: 30%;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .webtool-main {
+            flex-grow: 1;
+        }
+        .webtool-main iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
         footer {
             background: #004080;
             color: #fff;
@@ -95,10 +148,11 @@
         <h1>ARCEMS Modeling Group</h1>
         <p>Driving innovation in marine, terrestrial, and atmospheric modeling</p>
     </header>
-    <nav>
+   <nav>
         <a href="#about">About</a>
         <a href="#projects">Projects</a>
         <a href="#team">Team</a>
+        <a href="#webtool">Webtool</a>
         <a href="#contact">Contact</a>
     </nav>
     <section id="about" class="container">
@@ -193,7 +247,7 @@
                 <img src="salim.jpeg" alt="Mr. Salim Lateef">
                 <div class="card-content">
                     <h3>Mr. Salim Lateef</h3>
-                    <p>Lab Engineer III - Expert in GIS, Remote Sensing and Image processing</p>
+                    <p>Lab Engineer III - Expert in GIS, Remote Sensing and EIA</p>
                     <a href="salim_lateef.html">Learn more</a>
                 </div>
             </div>
@@ -204,6 +258,15 @@
                     <p>Post Doctoral Fellow - Expert in Observational/Satellite oceanography data analyses and applications.</p>
                     <a href="muhammed_sahfeeque.html">Learn more</a>
                 </div>
+            </div>
+        </div>
+    </section>
+<section id="webtool" class="container">
+        <h2>Webtool</h2>
+        <div class="dropdown">
+            <button>Tide Forecasting</button>
+            <div class="dropdown-content">
+                <a href="tide_forecasting.html" target="_blank">Tide Forecasting</a>
             </div>
         </div>
     </section>

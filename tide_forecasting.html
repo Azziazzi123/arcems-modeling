@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo Tide Visualization</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.20.0/plotly.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        #plotModal .modal-dialog {
+            max-width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <!-- Modal for Time Series Plot -->
+    <div class="modal fade" id="plotModal" tabindex="-1" aria-labelledby="plotModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="plotModalLabel">Time Series: Geo Tide</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="plot-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Map Initialization
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri',
+        });
+        const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+        });
+
+        const map = L.map('map', {
+            center: [23.8859, 45.0792], // Centered at the Arabian Peninsula
+            zoom: 5, // Adjusted zoom level to cover the Arabian Peninsula
+            layers: [satellite],
+        });
+
+        const baseMaps = { "Satellite": satellite, "Streets": streets };
+        L.control.layers(baseMaps).addTo(map);
+
+        // Add marker at the desired location
+        const marker = L.marker([28.006414, 48.820455]).addTo(map);
+        marker.bindPopup("<b>Safaniya</b>").openPopup();
+
+        // Handle marker click
+        marker.on('click', function () {
+            console.log("Marker clicked. Attempting to parse CSV...");
+
+            // Parse CSV file
+            Papa.parse('tide_data.csv', {
+                download: true,
+                header: true,
+                complete: function (result) {
+                    console.log("CSV data parsed successfully:", result.data);
+
+                    const data = result.data;
+
+                    // Check if data exists
+                    if (!data || data.length === 0) {
+                        console.error("No data found in CSV.");
+                        return;
+                    }
+
+                    // Extract x (DateTime) and y (Geo Tide) data
+                    const xData = data.map(row => row.DateTime);
+                    const yData = data.map(row => parseFloat(row['Geo_Tide (m)']));
+
+                    console.log("Parsed X Data (DateTime):", xData);
+                    console.log("Parsed Y Data (Geo Tide):", yData);
+
+                    // Plot the data
+                    const trace = {
+                        x: xData,
+                        y: yData,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: 'Geo Tide',
+                        line: { color: 'blue' },
+                        marker: { size: 6 }
+                    };
+
+                    const layout = {
+                        title: 'Geo Tide vs Date Time',
+                        xaxis: { title: 'Date Time', type: 'category' },
+                        yaxis: { title: 'Geo Tide (m)' },
+                        margin: { t: 40, l: 50, r: 20, b: 50 }
+                    };
+
+                    Plotly.newPlot('plot-container', [trace], layout);
+
+                    // Show the modal with the plot
+                    const modal = new bootstrap.Modal(document.getElementById('plotModal'));
+                    modal.show();
+                },
+                error: function (error) {
+                    console.error("Error loading CSV:", error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
