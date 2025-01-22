@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.20.0/plotly.min.js"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -123,6 +125,7 @@
 
         // Function to handle CSV parsing and plotting
         function plotGeoTide(csvFile, locationName) {
+            console.log(`Loading data for ${locationName} from ${csvFile}`);
             Papa.parse(csvFile, {
                 download: true,
                 header: true,
@@ -201,11 +204,11 @@
         const safaniyaMarker = L.marker([28.006414, 48.820455]).addTo(map);
         safaniyaMarker.bindPopup("<b>Safaniya</b>").openPopup();
         safaniyaMarker.on('click', function () {
-            plotGeoTide('safaniya_data.csv', 'Safaniya'); // Use Safaniya CSV file
+            plotGeoTide('tide_data.csv', 'Safaniya'); // Use Safaniya CSV file
         });
 
         // Add marker for Manifa
-        const manifaMarker = L.marker([27.480555, 48.850833]).addTo(map); // Approx. coordinates for Manifa
+        const manifaMarker = L.marker([27.749152, 48.892692]).addTo(map); // Approx. coordinates for Manifa
         manifaMarker.bindPopup("<b>Manifa</b>").openPopup();
         manifaMarker.on('click', function () {
             plotGeoTide('manifa_data.csv', 'Manifa'); // Use Manifa CSV file
