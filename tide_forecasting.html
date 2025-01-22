@@ -2,22 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1024, initial-scale=1.0"> <!-- Forces desktop width -->
     <title>Geo Tide Visualization</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.20.0/plotly.min.js"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* Horizontal layout */
             height: 100vh;
+        }
+
+        #left-panel {
+            width: 300px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+            padding: 10px;
+            box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Allows scrolling if content exceeds height */
+        }
+
+        #left-panel h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .location-item {
+            cursor: pointer;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .location-item:hover {
+            background-color: #ced4da;
         }
 
         #map-container {
@@ -33,14 +59,31 @@
         #plotModal .modal-dialog {
             max-width: 80%;
         }
+
+        #gifModal .modal-dialog {
+            max-width: 600px;
+        }
+
+        #gifModal img {
+            width: 100%; /* Make the GIF responsive */
+            height: auto;
+        }
     </style>
 </head>
 <body>
+    <!-- Left Panel -->
+    <div id="left-panel">
+        <h3>Regions</h3>
+        <div class="location-item" onclick="openGifModal('arabian_gulf.gif')">Arabian Gulf</div>
+        <div class="location-item" onclick="openGifModal('red_sea.gif')">Red Sea</div>
+    </div>
+
+    <!-- Map Container -->
     <div id="map-container">
         <div id="map"></div>
     </div>
 
-    <!-- Modal for Time Series Plot -->
+    <!-- Modal for Plot -->
     <div class="modal fade" id="plotModal" tabindex="-1" aria-labelledby="plotModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -55,23 +98,28 @@
         </div>
     </div>
 
+    <!-- Modal for GIF Display -->
+    <div class="modal fade" id="gifModal" tabindex="-1" aria-labelledby="gifModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gifModalLabel">Region Visualization</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="gifImage" src="" alt="GIF Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Map Initialization
-        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles © Esri',
-        });
-        const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-        });
-
-        const map = L.map('map', {
-            center: [23.8859, 45.0792], // Centered at the Arabian Peninsula
-            zoom: 5, // Adjusted zoom level to cover the Arabian Peninsula
-            layers: [satellite],
-        });
-
-        const baseMaps = { "Satellite": satellite, "Streets": streets };
-        L.control.layers(baseMaps).addTo(map);
+        // Function to open GIF modal
+        function openGifModal(gifPath) {
+            const gifModal = new bootstrap.Modal(document.getElementById('gifModal'));
+            document.getElementById('gifImage').src = gifPath; // Set GIF path
+            gifModal.show();
+        }
 
         // Function to handle CSV parsing and plotting
         function plotGeoTide(csvFile, locationName) {
@@ -132,15 +180,32 @@
             });
         }
 
+        // Map Initialization
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri',
+        });
+        const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+        });
+
+        const map = L.map('map', {
+            center: [23.8859, 45.0792], // Centered at the Arabian Peninsula
+            zoom: 5, // Adjusted zoom level to cover the Arabian Peninsula
+            layers: [satellite],
+        });
+
+        const baseMaps = { "Satellite": satellite, "Streets": streets };
+        L.control.layers(baseMaps).addTo(map);
+
         // Add marker for Safaniya
         const safaniyaMarker = L.marker([28.006414, 48.820455]).addTo(map);
         safaniyaMarker.bindPopup("<b>Safaniya</b>").openPopup();
         safaniyaMarker.on('click', function () {
-            plotGeoTide('tide_data.csv', 'Safaniya'); // Use Safaniya CSV file
+            plotGeoTide('safaniya_data.csv', 'Safaniya'); // Use Safaniya CSV file
         });
 
         // Add marker for Manifa
-        const manifaMarker = L.marker([27.749218, 48.895852]).addTo(map); // Approx. coordinates for Manifa
+        const manifaMarker = L.marker([27.480555, 48.850833]).addTo(map); // Approx. coordinates for Manifa
         manifaMarker.bindPopup("<b>Manifa</b>").openPopup();
         manifaMarker.on('click', function () {
             plotGeoTide('manifa_data.csv', 'Manifa'); // Use Manifa CSV file
