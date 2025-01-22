@@ -2,74 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1024, initial-scale=1.0"> <!-- Forces desktop width -->
     <title>Geo Tide Visualization</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.plotly.com/2.20.0/plotly.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.20.0/plotly.min.js"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* Horizontal layout */
             height: 100vh;
         }
 
-        #main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        #sidebar {
-            width: 320px;
-            padding: 20px;
+        #left-panel {
+            width: 300px;
             background-color: #f8f9fa;
             border-right: 1px solid #ddd;
+            padding: 10px;
             box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            overflow-y: auto; /* Allows scrolling if content exceeds height */
         }
 
-        #sidebar h2 {
+        #left-panel h3 {
             text-align: center;
-            color: #333;
-            font-size: 1.8rem;
             margin-bottom: 20px;
         }
 
-        .form-label {
-            font-weight: bold;
-            color: #444;
-        }
-
-        .form-control {
-            border-radius: 5px;
-            font-size: 0.9rem;
-        }
-
-        #sidebar button {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .location-item {
             cursor: pointer;
-            font-size: 1rem;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            text-align: center;
             transition: background-color 0.3s ease;
         }
 
-        #sidebar button:hover {
-            background-color: #0056b3;
+        .location-item:hover {
+            background-color: #ced4da;
         }
 
         #map-container {
@@ -82,260 +58,162 @@
             height: 100%;
         }
 
-        .checkbox-label {
-            font-weight: bold;
-            margin-right: 10px;
+        #plotModal .modal-dialog {
+            max-width: 80%;
         }
 
-        .hidden {
-            display: none;
+        #gifModal .modal-dialog {
+            max-width: 600px;
         }
 
-        .modal-header {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .welcome-modal-title {
-            font-size: 1.5rem;
+        #gifModal img {
+            width: 100%; /* Make the GIF responsive */
+            height: auto;
         }
     </style>
 </head>
 <body>
-    <div id="main-container">
-        <div id="sidebar">
-            <h2>Geo Tide Visualization</h2>
-            <form id="visualizationForm">
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="timeSeriesCheckbox" name="mode"> Time Series
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="spatialPlotCheckbox" name="mode"> Spatial Plot
-                    </label>
-                </div>
-
-                <!-- Time Series Inputs -->
-                <div id="timeSeriesInputs" class="hidden">
-                    <div class="form-group">
-                        <label for="latitude" class="form-label">Latitude:</label>
-                        <input type="text" class="form-control" id="latitude" name="latitude">
-                    </div>
-                    <div class="form-group">
-                        <label for="longitude" class="form-label">Longitude:</label>
-                        <input type="text" class="form-control" id="longitude" name="longitude">
-                    </div>
-                    <div class="form-group">
-                        <label for="start_date" class="form-label">Start Date:</label>
-                        <input type="date" class="form-control" id="start_date" name="start_date">
-                    </div>
-                    <div class="form-group">
-                        <label for="end_date" class="form-label">End Date:</label>
-                        <input type="date" class="form-control" id="end_date" name="end_date">
-                    </div>
-                    <div class="form-group">
-                        <label for="interval" class="form-label">Interval (seconds):</label>
-                        <input type="number" class="form-control" id="interval" name="interval">
-                    </div>
-                    <button type="button" id="runTimeSeriesButton" class="btn btn-primary mt-3">Generate Time Series</button>
-                </div>
-
-                <!-- Spatial Plot Inputs -->
-                <div id="spatialPlotInputs" class="hidden">
-                    <div class="form-group">
-                        <label for="min_latitude" class="form-label">Min Latitude:</label>
-                        <input type="text" class="form-control" id="min_latitude" name="min_latitude">
-                    </div>
-                    <div class="form-group">
-                        <label for="max_latitude" class="form-label">Max Latitude:</label>
-                        <input type="text" class="form-control" id="max_latitude" name="max_latitude">
-                    </div>
-                    <div class="form-group">
-                        <label for="min_longitude" class="form-label">Min Longitude:</label>
-                        <input type="text" class="form-control" id="min_longitude" name="min_longitude">
-                    </div>
-                    <div class="form-group">
-                        <label for="max_longitude" class="form-label">Max Longitude:</label>
-                        <input type="text" class="form-control" id="max_longitude" name="max_longitude">
-                    </div>
-                    <div class="form-group">
-                        <label for="date" class="form-label">Date:</label>
-                        <input type="date" class="form-control" id="date" name="date">
-                    </div>
-                    <div class="form-group">
-                        <label for="time" class="form-label">Time:</label>
-                        <input type="time" class="form-control" id="time" name="time">
-                    </div>
-                    <button type="button" id="runSpatialButton" class="btn btn-primary mt-3">Generate Spatial Plot</button>
-                </div>
-            </form>
-        </div>
-        <div id="map-container">
-            <div id="map"></div>
-        </div>
+    <!-- Left Panel -->
+    <div id="left-panel">
+        <h3>Regions</h3>
+        <div class="location-item" onclick="openGifModal('arabian_gulf.gif')">Arabian Gulf</div>
+        <div class="location-item" onclick="openGifModal('red_sea.gif')">Red Sea</div>
+	<div class="location-item" onclick="openGifModal('med_sea.gif')">Mediterranean Sea</div>
     </div>
 
-    <!-- Modal for Interactive Time Series Plot -->
+    <!-- Map Container -->
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <!-- Modal for Plot -->
     <div class="modal fade" id="plotModal" tabindex="-1" aria-labelledby="plotModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="plotModalLabel">Interactive Time Series Plot</h5>
+                    <h5 class="modal-title" id="plotModalLabel">Time Series: Geo Tide</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div id="plot-container"></div>
                 </div>
-                <div class="modal-footer">
-                    <a id="downloadExcel" class="btn btn-primary" href="#" download>Download Data (Excel)</a>
-                    <a id="downloadImage" class="btn btn-secondary" href="#" download>Download Plot (Image)</a>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal for Welcome -->
-    <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <!-- Modal for GIF Display -->
+    <div class="modal fade" id="gifModal" tabindex="-1" aria-labelledby="gifModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title welcome-modal-title" id="welcomeModalLabel">Welcome to Geo Tide Visualization</h5>
+                    <h5 class="modal-title" id="gifModalLabel">Region Visualization</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>This tool allows you to visualize tide levels for any location and time range. Use the controls on the left to configure your settings, then click <b>Run</b>.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Get Started</button>
+                    <img id="gifImage" src="" alt="GIF Image">
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        $(document).ready(function () {
-            // Welcome Modal
-            const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
-            welcomeModal.show();
+        // Function to open GIF modal
+        function openGifModal(gifPath) {
+            const gifModal = new bootstrap.Modal(document.getElementById('gifModal'));
+            document.getElementById('gifImage').src = gifPath; // Set GIF path
+            gifModal.show();
+        }
 
-            // Map Initialization
-            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles © Esri',
-            });
-            const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-            });
+        // Function to handle CSV parsing and plotting
+        function plotGeoTide(csvFile, locationName) {
+            console.log(`Loading data for ${locationName} from ${csvFile}`);
+            Papa.parse(csvFile, {
+                download: true,
+                header: true,
+                complete: function (result) {
+                    console.log(`${locationName} CSV data parsed successfully:`, result.data);
 
-            const map = L.map('map', {
-                center: [24.0, 45.0],
-                zoom: 5,
-                layers: [satellite],
-            });
+                    const data = result.data;
 
-            const baseMaps = { "Satellite": satellite, "Streets": streets };
-            L.control.layers(baseMaps).addTo(map);
+                    // Check if data exists
+                    if (!data || data.length === 0) {
+                        console.error(`No data found in CSV for ${locationName}.`);
+                        return;
+                    }
 
-            let marker;
-            map.on('click', function (e) {
-                if ($('#timeSeriesCheckbox').is(':checked')) {
-                    $('#latitude').val(e.latlng.lat.toFixed(6));
-                    $('#longitude').val(e.latlng.lng.toFixed(6));
-                    if (marker) marker.setLatLng(e.latlng);
-                    else marker = L.marker(e.latlng).addTo(map);
+                    // Extract x (DateTime) and y (Geo Tide) data
+                    const xData = data.map(row => new Date(row.DateTime)); // Convert DateTime to Date objects
+                    const yData = data.map(row => parseFloat(row['Geo_Tide (m)']));
+
+                    console.log(`Parsed X Data for ${locationName}:`, xData);
+                    console.log(`Parsed Y Data for ${locationName}:`, yData);
+
+                    // Plot the data
+                    const trace = {
+                        x: xData,
+                        y: yData,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: locationName,
+                        line: { color: locationName === 'Safaniya' ? 'blue' : 'green' },
+                        marker: { size: 6 }
+                    };
+
+                    const layout = {
+                        title: `Geo Tide vs Date Time (${locationName})`,
+                        xaxis: { 
+                            title: 'Date Time',
+                            type: 'date', // Explicitly set as a date axis
+                            dtick: 43200000, // 12 hours in milliseconds
+                            tickformat: '%Y-%m-%d %H:%M', // Format as YYYY-MM-DD HH:MM
+                            tickangle: -45, // Rotate labels 45 degrees for better visibility
+                        },
+                        yaxis: { title: 'Geo Tide (m)' },
+                        margin: { t: 40, l: 50, r: 20, b: 80 }, // Increase bottom margin
+                    };
+
+                    Plotly.newPlot('plot-container', [trace], layout);
+
+                    // Show the modal with the plot
+                    const modal = new bootstrap.Modal(document.getElementById('plotModal'));
+                    modal.show();
+                },
+                error: function (error) {
+                    console.error(`Error loading CSV for ${locationName}:`, error);
                 }
             });
+        }
 
-            const drawControl = new L.Control.Draw({
-                draw: { rectangle: true },
-                edit: false,
-            });
-            map.addControl(drawControl);
+        // Map Initialization
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri',
+        });
+        const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+        });
 
-            map.on(L.Draw.Event.CREATED, function (e) {
-                if ($('#spatialPlotCheckbox').is(':checked')) {
-                    const bounds = e.layer.getBounds();
-                    $('#min_latitude').val(bounds.getSouthWest().lat.toFixed(6));
-                    $('#max_latitude').val(bounds.getNorthEast().lat.toFixed(6));
-                    $('#min_longitude').val(bounds.getSouthWest().lng.toFixed(6));
-                    $('#max_longitude').val(bounds.getNorthEast().lng.toFixed(6));
-                }
-            });
+        const map = L.map('map', {
+            center: [23.8859, 45.0792], // Centered at the Arabian Peninsula
+            zoom: 5, // Adjusted zoom level to cover the Arabian Peninsula
+            layers: [satellite],
+        });
 
-            // Toggle Inputs Based on Selected Mode
-            $('input[type="checkbox"]').on('change', function () {
-                $('input[type="checkbox"]').not(this).prop('checked', false);
-                $('#timeSeriesInputs').toggleClass('hidden', !$('#timeSeriesCheckbox').is(':checked'));
-                $('#spatialPlotInputs').toggleClass('hidden', !$('#spatialPlotCheckbox').is(':checked'));
-            });
+        const baseMaps = { "Satellite": satellite, "Streets": streets };
+        L.control.layers(baseMaps).addTo(map);
 
-            // Time Series Submit
-            $('#runTimeSeriesButton').on('click', function () {
-                const data = {
-                    latitude: $('#latitude').val(),
-                    longitude: $('#longitude').val(),
-                    start_date: $('#start_date').val(),
-                    end_date: $('#end_date').val(),
-                    interval: $('#interval').val(),
-                };
+        // Add marker for Safaniya
+        const safaniyaMarker = L.marker([28.006414, 48.820455]).addTo(map);
+        safaniyaMarker.bindPopup("<b>Safaniya</b>").openPopup();
+        safaniyaMarker.on('click', function () {
+            plotGeoTide('tide_data.csv', 'Safaniya'); // Use Safaniya CSV file
+        });
 
-                Swal.fire({ title: 'Generating Time Series...', didOpen: () => Swal.showLoading() });
-
-                $.ajax({
-                    url: '/update',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        Swal.close();
-                        $('#plot-container').html(response.graph_html);
-                        $('#downloadExcel').attr('href', response.excel_url);
-                        $('#downloadImage').attr('href', response.image_url);
-                        const modal = new bootstrap.Modal(document.getElementById('plotModal'));
-                        modal.show();
-                    },
-                    error: function () {
-                        Swal.close();
-                        Swal.fire('Error', 'Failed to generate time series.', 'error');
-                    },
-                });
-            });
-
- // Spatial Plot Submit
-$('#runSpatialButton').on('click', function () {
-    const data = {
-        min_latitude: $('#min_latitude').val(),
-        max_latitude: $('#max_latitude').val(),
-        min_longitude: $('#min_longitude').val(),
-        max_longitude: $('#max_longitude').val(),
-        date: $('#date').val(),
-        time: $('#time').val(),
-    };
-
-    Swal.fire({ title: 'Generating Spatial Plot...', didOpen: () => Swal.showLoading() });
-
-    $.ajax({
-        url: '/spatial_plot',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function (response) {
-            Swal.close();
-            $('#plot-container').html(response.graph_html);
-            $('#downloadSpatialExcel').attr('href', response.excel_url);
-            $('#downloadSpatialImage').attr('href', response.image_url);
-            const modal = new bootstrap.Modal(document.getElementById('plotModal'));
-            modal.show();
-        },
-        error: function () {
-            Swal.close();
-            Swal.fire('Error', 'Failed to generate spatial plot.', 'error');
-        },
-    });
-});
-
-
+        // Add marker for Manifa
+        const manifaMarker = L.marker([27.749152, 48.892692]).addTo(map); // Approx. coordinates for Manifa
+        manifaMarker.bindPopup("<b>Manifa</b>").openPopup();
+        manifaMarker.on('click', function () {
+            plotGeoTide('manifa_data.csv', 'Manifa'); // Use Manifa CSV file
         });
     </script>
 </body>
 </html>
-
